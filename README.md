@@ -16,7 +16,7 @@ The mock API server was built from scratch to simulate real-world HR data scenar
 
 ## 🔗 Links
 
-- **Live Demo:** [https://hr-dashboard-arpanhub.vercel.app/](https://hr-dashboard-arpanhub.vercel.app/)
+- **Live Demo:**[https://hr-dashboard-blond.vercel.app/](https://hr-dashboard-blond.vercel.app/))
 - **Mock API Server:** [https://mockapi-hrdashboard.onrender.com/api/employees](https://mockapi-hrdashboard.onrender.com/api/employees)
 - **API Source Code:** [https://github.com/arpanhub/MockAPI_HrDashboard](https://github.com/arpanhub/MockAPI_HrDashboard)
 ---
