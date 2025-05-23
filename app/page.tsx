@@ -8,7 +8,7 @@ export default function Home() {
       <div className="max-w-4xl mx-auto text-center">
         <h2 className="bg-clip-text text-transparent text-center bg-gradient-to-b from-neutral-600 to-white text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-sans py-4 sm:py-6 md:py-8 lg:py-10 relative z-20 tracking-tight leading-tight">
           <span
-            className="bg-clip-text text-transparent font-bold block mb-2 sm:mb-4"
+            className="bg-clip-text text-transparent font-bold block "
             style={{
               backgroundImage: "linear-gradient(to bottom, #222, #b9fa00)",
               WebkitBackgroundClip: "text",
