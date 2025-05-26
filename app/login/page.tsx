@@ -3,7 +3,7 @@
 import { signIn, getSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, Suspense } from "react";
 import toast from "react-hot-toast";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,8 @@ import {
   IconBrandGoogle,
 } from "@tabler/icons-react";
 
-export default function LoginPage() {
+// Separate component for the search params logic
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -23,7 +24,6 @@ export default function LoginPage() {
     password: "",
   });
 
-  
   useEffect(() => {
     const error = searchParams.get('error');
     if (error) {
@@ -158,6 +158,26 @@ export default function LoginPage() {
         </div>
       </form>
     </div>
+  );
+}
+
+// Loading fallback component
+function LoginLoading() {
+  return (
+    <div className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
+      <div className="my-8">
+        <h3 className="text-2xl font-semibold text-center mb-4">Loading...</h3>
+      </div>
+    </div>
+  );
+}
+
+// Main component wrapped with Suspense
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<LoginLoading />}>
+      <LoginForm />
+    </Suspense>
   );
 }
 
