@@ -12,8 +12,24 @@ import {
   IconBrandGithub,
   IconBrandGoogle,
 } from "@tabler/icons-react";
+import { AlertTriangle, Info } from "lucide-react";
 
-// Separate component for the search params logic
+
+const TipWarning = () => {
+  return (
+    <div className="mb-6 p-3 rounded-md bg-slate-50/50 border border-slate-200/50 dark:bg-slate-900/30 dark:border-slate-800/50">
+      <div className="flex items-center space-x-2">
+        <span className="text-sm">💡</span>
+        <p className="text-xs text-slate-600 dark:text-slate-400 italic">
+          <span className="font-medium text-slate-700 dark:text-slate-300">Psst...</span> If OAuth gods are moody today, 
+          try the old-school email/password combo - <span className="font-medium">janhit me jari</span> 🙏
+        </p>
+      </div>
+    </div>
+  );
+};
+
+
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -48,7 +64,7 @@ function LoginForm() {
     }
   }, [user]);
 
-  // Handle email/password login using NextAuth credentials provider
+  
   const handleCredentialsLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -74,7 +90,7 @@ function LoginForm() {
     }
   };
 
-  // Handle OAuth login (GitHub/Google)
+  
   const handleOAuthLogin = async (provider: 'github' | 'google') => {
     try {
       await signIn(provider, {
@@ -89,7 +105,10 @@ function LoginForm() {
   return (
     <div className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
       <form className="my-8" onSubmit={handleCredentialsLogin}>
-        <h3 className="text-2xl font-semibold text-center mb-4">Login</h3>
+        <h3 className="text-2xl font-semibold text-center mb-6">Login</h3>
+
+        
+        <TipWarning />
 
         <LabelInputContainer className="mb-4">
           <Label htmlFor="email">Email Address</Label>

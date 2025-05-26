@@ -3,7 +3,7 @@ import React from "react";
 import { cn } from "@/lib/utils";
 import { Star, Bookmark, BookmarkCheck, Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
-import toast, { Toaster } from 'react-hot-toast';
+
 interface EmployeeCardProps {
   id: string;
   name: string;
@@ -15,7 +15,7 @@ interface EmployeeCardProps {
   skills: string[];
   bookmarked: boolean;
   isActive: boolean;
-  onBookmarkToggle?: (id: string) => void;
+  onBookmarkToggle?: () => void;
 }
 
 interface AddEmployeeCardProps {
@@ -37,13 +37,13 @@ export default function EmployeeCard({
 }: EmployeeCardProps) {
   const router = useRouter();
 
-  // const handleCardClick = () => {
-  //   router.push(`/employee/${id}`);
-  // };
+  const handleCardClick = () => {
+    router.push(`/Employee/${id}`);
+  };
 
   const handleBookmarkClick = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent card click
-    onBookmarkToggle?.(id);
+    e.stopPropagation(); // Prevent card click navigation
+    onBookmarkToggle?.();
   };
 
   const getRatingColor = (rating: number) => {
@@ -62,15 +62,12 @@ export default function EmployeeCard({
 
   return (
     <div
-      // onClick={}
+      onClick={handleCardClick}
       className="group relative bg-black/40 hover:bg-black/60 border border-neutral-800 hover:border-neutral-200 rounded-xl p-6 backdrop-blur-sm cursor-pointer transition-all duration-300 hover:scale-[1.02] hover:shadow-2xl hover:shadow-white/5"
     >
       {/* Bookmark Button */}
-
       <button
-        onClick={(e) => {
-          handleBookmarkClick(e)          
-        }}
+        onClick={handleBookmarkClick}
         className="absolute top-4 right-4 p-1.5 rounded-lg bg-black/50 hover:bg-black/80 transition-colors z-10"
       >
         {bookmarked ? (
