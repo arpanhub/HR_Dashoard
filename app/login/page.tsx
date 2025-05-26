@@ -1,9 +1,9 @@
 "use client";
 
+import { signIn, getSession } from "next-auth/react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import toast from "react-hot-toast";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -13,42 +13,82 @@ import {
   IconBrandGoogle,
 } from "@tabler/icons-react";
 
-export default function SignupPage() {
+export default function LoginPage() {
   const router = useRouter();
-  const [loading, setloading] = useState(false);
-  const [buttonDisabled, setbuttonDisabled] = useState(true);
-  const [user, setUser] = React.useState({
+  const searchParams = useSearchParams();
+  const [loading, setLoading] = useState(false);
+  const [buttonDisabled, setButtonDisabled] = useState(true);
+  const [user, setUser] = useState({
     email: "",
     password: "",
   });
 
+  
+  useEffect(() => {
+    const error = searchParams.get('error');
+    if (error) {
+      switch (error) {
+        case 'OAuthAccountNotLinked':
+          toast.error('An account with this email already exists. Please sign in with your email and password first.');
+          break;
+        case 'OAuthCallback':
+          toast.error('OAuth callback error. Please try again.');
+          break;
+        default:
+          toast.error('Authentication error. Please try again.');
+      }
+    }
+  }, [searchParams]);
+
   useEffect(() => {
     if (user.email.length > 0 && user.password.length > 0) {
-      setbuttonDisabled(false);
+      setButtonDisabled(false);
     } else {
-      setbuttonDisabled(true);
+      setButtonDisabled(true);
     }
   }, [user]);
 
-  const login = async (e: React.FormEvent) => {
-    e.preventDefault(); // prevent page reload
+  // Handle email/password login using NextAuth credentials provider
+  const handleCredentialsLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
     try {
-      setloading(true);
-      const response = await axios.post("/api/users/login", user);
-      if (response.data.success) {
-        toast.success(response.data.message);
+      setLoading(true);
+      
+      const result = await signIn('credentials', {
+        email: user.email,
+        password: user.password,
+        redirect: false, 
+      });
+      console.log("Login result:", result);
+      if (result?.error) {
+        toast.error("Invalid credentials");
+      } else if (result?.ok) {
+        toast.success("Login successful!");
         router.push("/Dashboard");
       }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Login failed");
+      toast.error("Login failed");
+      console.error("Login error:", error);
     } finally {
-      setloading(false);
+      setLoading(false);
+    }
+  };
+
+  // Handle OAuth login (GitHub/Google)
+  const handleOAuthLogin = async (provider: 'github' | 'google') => {
+    try {
+      await signIn(provider, {
+        callbackUrl: '/Dashboard' 
+      });
+    } catch (error) {
+      toast.error(`${provider} login failed`);
+      console.error(`${provider} login error:`, error);
     }
   };
 
   return (
     <div className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
-      <form className="my-8" onSubmit={login}>
+      <form className="my-8" onSubmit={handleCredentialsLogin}>
         <h3 className="text-2xl font-semibold text-center mb-4">Login</h3>
 
         <LabelInputContainer className="mb-4">
@@ -93,8 +133,9 @@ export default function SignupPage() {
 
         <div className="flex flex-col space-y-4">
           <button
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
+            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
             type="button"
+            onClick={() => handleOAuthLogin('google')}
           >
             <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-sm text-neutral-700 dark:text-neutral-300">
@@ -102,9 +143,11 @@ export default function SignupPage() {
             </span>
             <BottomGradient />
           </button>
+          
           <button
-            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626]"
+            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
             type="button"
+            onClick={() => handleOAuthLogin('github')}
           >
             <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
             <span className="text-sm text-neutral-700 dark:text-neutral-300">

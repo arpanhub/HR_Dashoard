@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
+import SessionWrapper from "@/Component/SessionWrapper";
+
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -20,26 +22,21 @@ export const metadata: Metadata = {
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
     <html lang="en" suppressHydrationWarning>
+      
       <body 
         className={`${geistSans.variable} ${geistMono.variable} antialiased min-h-screen`}
         style={{ touchAction: 'manipulation' }}
-      >
-        <Toaster 
-          position="top-center"
-          toastOptions={{
-            className: 'text-sm',
-            style: {
-              maxWidth: '90vw',
-            },
-          }}
-        />
-        {children}
+        >
+        <SessionWrapper>
+          {children}
+        </SessionWrapper>
       </body>
+      
     </html>
   );
 }

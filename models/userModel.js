@@ -13,12 +13,25 @@ const userSchema = new mongoose.Schema({
     },
     password:{
         type:String,
-        required:[true,"Password is required"],
+        required:function(){
+            return !this.provider;
+        }
     },
     isVerified:{
         type:Boolean,
         default:false,
     },
+    provider:{
+        type:String,
+        enum:["credentials","github","google"],
+        default:"credentials",
+    },
+    providerId:{
+        type:String,
+        default:null,
+    },
+    image:String,
+    emailVerified:Date,
     isAdmin:{
         type:Boolean,
         default:false,
@@ -27,6 +40,8 @@ const userSchema = new mongoose.Schema({
     forgotPasswordTokenExpiry:Date,
     verifyToken:String,
     verifyTokenExpiry:Date,
+},{
+    timestamps:true,
 })
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 

@@ -13,7 +13,8 @@ import {
 import React from 'react';
 import { useState } from "react";
 import { useRouter } from 'next/navigation';
-import axios from "axios";
+import { signOut } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export default function Navbar() {
   const router = useRouter();
@@ -33,18 +34,17 @@ export default function Navbar() {
     },
   ];
   const handleLogout = async()=>{
-        try {
-            setloading(true);
-            await axios.get('/api/users/logout');
-            // toast.success("Logout successful");
-            router.push('/');
-        } catch (error:any) {
-            console.log("Failed to logout",error.message);
-            // toast.error(error.message);
-        }finally{
-            setloading(false);
+        try{
+          await signOut({
+            callbackUrl:'/login',
+            redirect:true
+          });
+          toast.success("Logout successful!");
+        }catch(error){
+          toast.error("logout failed");
+          console.error("Logout error:", error);
         }
-    }
+    };
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   return (
@@ -86,11 +86,11 @@ export default function Navbar() {
             ))}
             <div className="flex w-full flex-col gap-4">
               <NavbarButton
-                onClick={() => setIsMobileMenuOpen(false)}
+                onClick={handleLogout}
                 variant="primary"
                 className="w-full"
               >
-                Book a call
+                logout
               </NavbarButton>
             </div>
           </MobileNavMenu>

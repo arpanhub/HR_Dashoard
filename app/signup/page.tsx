@@ -1,5 +1,6 @@
 "use client";
 
+import { signIn } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
@@ -8,6 +9,10 @@ import toast from "react-hot-toast";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
+import {
+  IconBrandGithub,
+  IconBrandGoogle,
+} from "@tabler/icons-react";
 
 export default function SignupPage() {
   const router = useRouter();
@@ -24,25 +29,51 @@ export default function SignupPage() {
     setButtonDisabled(!(username && email && password));
   }, [user]);
 
-  const signup = async (e: React.FormEvent) => {
+  // Handle email/password signup (keep your existing logic)
+  const handleCredentialsSignup = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       setLoading(true);
       const response = await axios.post("/api/users/signup", user);
       toast.success("Signup successful!");
-      router.push("/login");
+      
+      // After successful signup, automatically sign them in
+      const signInResult = await signIn('credentials', {
+        email: user.email,
+        password: user.password,
+        redirect: false,
+      });
+
+      if (signInResult?.ok) {
+        router.push("/Dashboard");
+      } else {
+        // If auto sign-in fails, redirect to login
+        router.push("/login");
+      }
     } catch (error: any) {
-      toast.error(error.response?.data?.message || "Signup failed");
+      toast.error(error.response?.data?.error || "Signup failed");
     } finally {
       setLoading(false);
     }
   };
 
+  // Handle OAuth signup (GitHub/Google)
+  const handleOAuthSignup = async (provider: 'github' | 'google') => {
+    try {
+      await signIn(provider, {
+        callbackUrl: '/Dashboard' // Redirect here after successful signup
+      });
+    } catch (error) {
+      toast.error(`${provider} signup failed`);
+      console.error(`${provider} signup error:`, error);
+    }
+  };
+
   return (
     <div className="shadow-input mx-auto w-full max-w-md rounded-none bg-white p-4 md:rounded-2xl md:p-8 dark:bg-black">
-      <form className="my-8" onSubmit={signup}>
+      <form className="my-8" onSubmit={handleCredentialsSignup}>
         <h3 className="text-2xl font-semibold text-center mb-4">
-          {loading ? "Signing up..." : "Signup"}
+          {loading ? "Signing up..." : "Sign Up"}
         </h3>
 
         <LabelInputContainer className="mb-4">
@@ -99,6 +130,34 @@ export default function SignupPage() {
             Login
           </Link>
         </p>
+
+        <div className="my-8 h-[1px] w-full bg-gradient-to-r from-transparent via-neutral-300 to-transparent dark:via-neutral-700" />
+
+        <div className="flex flex-col space-y-4">
+          <button
+            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+            type="button"
+            onClick={() => handleOAuthSignup('google')}
+          >
+            <IconBrandGoogle className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+            <span className="text-sm text-neutral-700 dark:text-neutral-300">
+              Continue with Google
+            </span>
+            <BottomGradient />
+          </button>
+          
+          <button
+            className="group/btn shadow-input relative flex h-10 w-full items-center justify-start space-x-2 rounded-md bg-gray-50 px-4 font-medium text-black dark:bg-zinc-900 dark:shadow-[0px_0px_1px_1px_#262626] hover:bg-gray-100 dark:hover:bg-zinc-800 transition-colors"
+            type="button"
+            onClick={() => handleOAuthSignup('github')}
+          >
+            <IconBrandGithub className="h-4 w-4 text-neutral-800 dark:text-neutral-300" />
+            <span className="text-sm text-neutral-700 dark:text-neutral-300">
+              Continue with GitHub
+            </span>
+            <BottomGradient />
+          </button>
+        </div>
       </form>
     </div>
   );
