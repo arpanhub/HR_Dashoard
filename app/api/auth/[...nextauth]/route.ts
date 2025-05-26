@@ -8,16 +8,39 @@ import bcryptjs from "bcryptjs"
 import User from "@/models/userModel"
 import { connect } from "@/dbConfig/dbConfig"
 
+// Extend NextAuth types to include 'id' on session.user and token
+import NextAuthTypes from "next-auth"
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string
+      name?: string | null
+      email?: string | null
+      image?: string | null
+    }
+  }
+  interface User {
+    id: string
+    name?: string | null
+    email?: string | null
+    image?: string | null
+  }
+}
+declare module "next-auth/jwt" {
+  interface JWT {
+    id?: string
+    name?: string | null
+    email?: string | null
+    picture?: string | null
+  }
+}
+
 const client = new MongoClient(process.env.MONGO_URI!)
 const clientPromise = client.connect()
 
 const handler = NextAuth({
-  
-  // Remove adapter to handle everything manually
-  // adapter: MongoDBAdapter(clientPromise),
-  
   providers: [
-    
+
     GithubProvider({
       clientId: process.env.GITHUB_ID!,
       clientSecret: process.env.GITHUB_SECRET!,
@@ -131,15 +154,14 @@ const handler = NextAuth({
     }
   },
 
-  // Enable account linking - this is the key addition
+  
   pages: {
     signIn: '/login',
   },
 
-  // Add this to enable automatic account linking
+  
   events: {
     async linkAccount({ user, account }) {
-      // This event fires when accounts are linked
       console.log("Account linked:", { user: user.email, provider: account.provider })
     }
   },
