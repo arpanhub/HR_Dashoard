@@ -11,7 +11,7 @@ interface EmployeePageProps {
   }>;
 }
 
-export default function EmployeePage({ params }: EmployeePageProps) {
+export default function EmployeePage({ params }: EmployeePageProps): React.ReactElement {
   const { employees, isLoading } = useEmployees();
   const { toggleBookmark } = useBookmarks();
   
@@ -19,7 +19,7 @@ export default function EmployeePage({ params }: EmployeePageProps) {
   const resolvedParams = React.use(params);
   
   // Find the specific employee
-  const employee = employees.find(emp => emp.id === resolvedParams.id);
+  const employee = employees?.find(emp => emp.id === resolvedParams.id);
 
   // Show loading state
   if (isLoading) {
@@ -39,6 +39,8 @@ export default function EmployeePage({ params }: EmployeePageProps) {
   }
 
   const handleBookmarkToggle = () => {
+    if (!employee) return;
+    
     toggleBookmark(employee.id);
     toast.success(
       !employee.bookmarked
@@ -52,7 +54,7 @@ export default function EmployeePage({ params }: EmployeePageProps) {
 
   return (
     <EmployeeDetailsView 
-      employee={employee} 
+      employee={employee as any} 
       onBookmarkToggle={handleBookmarkToggle}
     />
   );
