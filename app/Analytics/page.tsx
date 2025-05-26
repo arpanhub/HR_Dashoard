@@ -199,7 +199,7 @@ const generateAnalyticsData = (employees: Employee[]): AnalyticsData | null => {
 
 const CHART_COLORS = ['#60a5fa', '#34d399', '#fbbf24', '#f87171', '#a78bfa', '#fb7185', '#38bdf8', '#4ade80'];
 
-export default function Analytics(): JSX.Element {
+export default function Analytics(): React.ReactElement {
   const [filterPeriod, setFilterPeriod] = useState<string>("all");
   const { employees, isLoading, hasLoaded } = useEmployees();
   const [analyticsData, setAnalyticsData] = useState<AnalyticsData | null>(null);
